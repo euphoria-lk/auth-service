@@ -11,17 +11,17 @@
  * name     : The name of your user
  */
 const users = [{
-    id: '1',
+    id      : '1',
     username: 'bob',
     password: 'secret',
-    name: 'Bob Smith',
-    role: 'counselor',
+    name    : 'Bob Smith',
+    role    : 'counselor',
 }, {
-    id: '2',
+    id      : '2',
     username: 'joe',
     password: 'password',
-    name: 'Joe Davis',
-    role: 'client',
+    name    : 'Joe Davis',
+    role    : 'client',
 }];
 
 /**
