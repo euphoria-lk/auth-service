@@ -1,0 +1,294 @@
+<!doctype html>
+<html>
+<head>
+  <title>oauth2orizerecipes</title>
+  <!-- needed for mobile sites to work -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- style sheets -->
+  <link rel="stylesheet" type="text/css" href="../stylesheets/pure-min.css">
+  <link rel="stylesheet" type="text/css" href="../stylesheets/base.css">
+  <link rel="stylesheet" type="text/css" href="../stylesheets/index-modules.css">
+  <script type="text/javascript" src="../javascripts/jquery.min.js"></script>
+
+  <!-- javascript -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var http = location.protocol;
+      var slashes = http.concat("//");
+      var port = location.port ? ':' + location.port : '';
+      var host = slashes.concat(window.location.hostname) + port;
+      var fragment = window.location.hash;
+
+      //replace the host name from the url and replace all the links we have with the host name as well.
+      $(".hostname").text(host);
+      $("#authcode").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=code&client_id=abc123&scope=offline_access");
+      $("#implicit").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=token&client_id=abc123");
+
+      if (!fragment) {
+        //they did not come from the implicit work flow, so show the main work flow of the page.
+        $("#main").show();
+      } else {
+        //if we have a fragment then they must have come from the url during an implicit call.  so show the
+        //implicit work flow.
+        $("#implicitdiv").show();
+        $("#accesstokenresult").text(fragment.substring(fragment.indexof("access_token="), fragment.indexof("&")));
+        $("#expirationresult").text(fragment.substring(fragment.indexof("expires_in="), fragment.indexof("&token_type=")));
+        $("#tokentyperesult").text(fragment.substring(fragment.indexof("token_type=")));
+        $(".access_token").text(fragment.substring((fragment.indexof("access_token=") + "access_token".length + 1), fragment.indexof("&")));
+      }
+
+      $("#apiendpointbutton").click(function (event) {
+        //they clicked on the api end point button, so hide the implicit work flow and
+        //make the ajax call to get the user information using the fragment from the url
+        $.ajax({
+          type: 'get',
+          datatype: 'json',
+          url: '/api/userinfo',
+          headers: {
+            "authorization": "bearer " + fragment.substring(14, fragment.indexof("&"))
+          },
+          success: function (result) {
+            $("#implicitdiv").hide();
+            $("#userinformation").show();
+            $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+          }
+        });
+      });
+
+      $("#resourceownersubmitpostbutton").click(function (event) {
+        //they clicked on the submit post button underneath the resource owner section
+        $.ajax({
+          type: 'post',
+          datatype: 'json',
+          url: "/oauth/token",
+          headers: {
+            //this is euphoria-client:ssh-secret base 64 encoded
+            "authorization": "basic ZXVwaG9yaWEtY2xpZW50OnNzaC1zZWNyZXQ="
+          },
+          data: 'grant_type=password&username=bob&password=secret&scope=offline_access',
+          success: function (result) {
+            //hide the main screen because we were successful, add the access token info, and
+            //show the resource owner token section
+            $("#main").hide();
+            $(".access_token").text(result.access_token);
+            $("#accesstoken").show();
+            $("#fullresult").append(json.stringify(result, undefined, 4));
+
+            $("#accesstokencallapibutton").click(function (event) {
+              //they clicked on the resource owner token api call
+              $.ajax({
+                type: 'get',
+                datatype: 'json',
+                url: '/api/userinfo',
+                headers: {
+                  "authorization": "bearer " + result.access_token
+                },
+                success: function (result) {
+                  $("#accesstoken").hide();
+                  $("#userinformation").show();
+                  $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+                }
+              });
+            });
+          }
+        });
+      });
+
+      $("#clientsubmitpostbutton").click(function (event) {
+        //they clicked on the submit post button underneath the client section
+        $.ajax({
+          type: 'post',
+          datatype: 'json',
+          url: "/oauth/token",
+          headers: {
+            //this is abc123:ssh-secret base 64 encoded
+            "authorization": "basic ywjjmtizonnzac1zzwnyzxq="
+          },
+          data: 'grant_type=client_credentials',
+          success: function (result) {
+            $("#main").hide();
+            $(".access_token").text(result.access_token);
+            $("#accesstoken").show();
+            $("#fullresult").append(json.stringify(result, undefined, 4));
+
+            $("#accesstokencallapibutton").click(function (event) {
+              $.ajax({
+                type: 'get',
+                datatype: 'json',
+                url: '/api/userinfo',
+                headers: {
+                  "authorization": "bearer " + result.access_token
+                },
+                success: function (result) {
+                  $("#accesstoken").hide();
+                  $("#userinformation").show();
+                  $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+                }
+              });
+            });
+          }
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+
+<!-- main code screen with no url fragments -->
+<div id="main" style="display: none;">
+  <h1>oauth2orizerecipes server</h1>
+
+  <p>
+    <!-- welcome message -->
+    welcome to oauth 2.0. try one of the grant types below. for more information, see the
+    <a href="https://github.com/frankhassanabad/oauth2orizerecipes/wiki">wiki site</a>.<br/>
+
+    <!-- authorization code grant -->
+
+  <h2><a href="http://tools.ietf.org/html/rfc6749#section-4.1">authorization code</a><br/></h2>
+  the authorization code grant type is used to obtain both access tokens and refresh tokens and is optimized for
+  confidential clients. click the link below to begin the grant type.
+  <a id="authcode" href="">
+                <pre>
+  <span class="hostname">https://localhost:3000</span>/dialog/authorize?
+  redirect_uri=<span class="hostname">https://localhost:3000</span>&
+  response_type=code&
+  client_id=abc123&
+  scope=offline_access
+                </pre>
+  </a>
+
+  <!-- implicit grant -->
+  <p>
+
+  <h2><a href="http://tools.ietf.org/html/rfc6749#section-4.2">implicit</a><br/></h2>
+  the implicit grant type is used to obtain access tokens (it does not support the issuance of refresh tokens) and
+  is optimized for public clients known to operate a particular redirection uri. click the link below to begin
+  the grant type.
+  <a id="implicit" href="">
+            <pre>
+  <span class="hostname">https://localhost:3000/</span>/dialog/authorize?
+  redirect_uri=<span class="hostname">https://localhost:3000</span>&
+  response_type=token&
+  client_id=abc123
+            </pre>
+  </a>
+
+  <!-- resource owner grant -->
+  <div id="resourceowner">
+    <p>
+
+    <h2><a href="http://tools.ietf.org/html/rfc6749#section-4.3">resource owner password credentials</a><br/></h2>
+    the resource owner password credentials grant type is suitable in cases where the resource owner has a trust
+    relationship with the client, such as the device operating system or a highly privileged application. open your
+    browser's debug tools, and click the submit post button below to begin the grant type.
+                <pre>
+  post oauth/token http/1.1
+  host: <span class="hostname">https://localhost:3000</span>
+  content-type: application/x-www-form-urlencoded
+  authorization: basic ywjjmtizonnzac1zzwnyzxq=
+
+  grant_type=password&
+  username=bob&
+  password=secret&
+  scope=offline_access
+                </pre>
+    <p>
+      <button id="resourceownersubmitpostbutton" class="pure-button pure-button-primary" type="button">submit post
+      </button>
+    </p>
+  </div>
+  <br/>
+
+  <!-- client credentials grant -->
+  <div id="clientcredentials">
+    <p>
+
+    <h2><a href="http://tools.ietf.org/html/rfc6749#section-4.4">client credentials</a><br/></h2>
+    the client can request an access token using only its client credentials (or other supported means of
+    authentication)
+    when the client is requesting access to the protected resources under its control, or those of another resource
+    owner that have been previously arranged with the authorization server. open your browser's debug tools, and click
+    the submit post button below to begin the grant type.
+            <pre>
+  post oauth/token http/1.1
+  host: <span class="hostname">https://localhost:3000</span>
+  content-type: application/x-www-form-urlencoded
+  authorization: basic ywjjmtizonnzac1zzwnyzxq=
+
+  grant_type=client_credentials
+            </pre>
+    <p>
+      <button id="clientsubmitpostbutton" class="pure-button pure-button-primary" type="button">submit post</button>
+    </p>
+  </div>
+</div>
+
+<!-- url fragment for the access token so display that information -->
+<div id="implicitdiv" style="display: none;">
+  <h1>
+    access token
+  </h1>
+
+  <p>
+    in your url you will see the following access_token fragment which has your
+    your access token, expiration, and token type
+  </p>
+        <pre><span id="accesstokenresult"></span>
+
+<span id="expirationresult"></span>
+
+<span id="tokentyperesult"></span></pre>
+  <p>
+    you can use your access token to call an endpoint such as a user info endpoint.
+    to do this, set the authorization bearer to have your access token. open your browser's debug tools,
+    press the call api endpoint button and look at your network tab.
+  </p>
+        <pre>get /api/userinfo http/1.1
+host: <span class="hostname">https://localhost:3000</span>
+authorization: bearer <span class="access_token"></span>
+        </pre>
+  <button id="apiendpointbutton" class="pure-button pure-button-primary" type="button">call api endpoint</button>
+</div>
+
+<!-- shown after the user clicks "call api endpoint" button -->
+<div id="userinformation" style="display: none;">
+  <h1>
+    user information
+  </h1>
+
+  <p>
+    underneath your brower's network tab you will see the following json response from a successful api endpoint call.
+  </p>
+  <pre><span id="userjsoninfo"></span></pre>
+</div>
+
+<!-- shown after the user clicks the "submit post" on the resource owner password -->
+<div id="accesstoken" style="display: none;">
+  <h1>
+    access token
+  </h1>
+
+  <p>
+    underneath your browser's network tab you will see the following response
+    with your access token, refresh token, expiration time, and token type
+  </p>
+  <pre><span id="fullresult"></span></pre>
+  <p>
+    you can use your access token to call an endpoint such as a user info endpoint.
+    to do this, set the authorization bearer to have your access token. press the
+    call api endpoint button and look at your network tab.
+  </p>
+        <pre>get /api/userinfo http/1.1
+host: <span class="hostname">https://localhost:3000</span>
+authorization: bearer <span class="access_token"></span>
+        </pre>
+  <button id="accesstokencallapibutton" class="pure-button pure-button-primary" type="button">call api endpoint</button>
+</div>
+
+</body>
+</html>
+
+

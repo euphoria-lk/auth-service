@@ -135,7 +135,7 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
   .catch(() => done(null, false));
 }));
 
-/*
+/**
  * User authorization endpoint
  *
  * `authorization` middleware accepts a `validate` callback which is

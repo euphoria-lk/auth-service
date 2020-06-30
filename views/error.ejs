@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>OAuth2Orize Error</title>
+    <!-- Needed for mobile sites to work -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Style sheets -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/base.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/index-module.css">
+    <script type="text/javascript" src="javascripts/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        })
+    </script>
+</head>
+<body>
+<h1 id="message"><%= message %></h1>
+<h2 id="status"><%= error.status %></h2>
+<pre id=""><%= error.stack %></pre>
+</body>
+</html>
