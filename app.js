@@ -7,7 +7,6 @@ const bodyParser     = require('body-parser');
 // const expressSession = require('express-session');
 // const https          = require('https');
 const passport       = require('passport');
-const path           = require('path');
 // const fs             = require('fs');
 
 const client = require('./client');
