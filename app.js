@@ -33,8 +33,19 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+// console.log('Using MemoryStore for the data store');
+// console.log('Using MemoryStore for the Session');
+// const MemoryStore = expressSession.MemoryStore;
+//
+// // Session Configuration
+// app.use(expressSession({
+//     saveUninitialized : true,
+//     resave            : true,
+//     secret            : config.session.secret,
+//     store             : new MemoryStore(),
+//     key               : 'authorization.sid',
+//     cookie            : { maxAge: config.session.maxAge },
+// }));
 
 
 app.use(bodyParser.urlencoded({extended: true}));
