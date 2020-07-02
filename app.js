@@ -4,7 +4,7 @@ const path           = require('path');
 const cookieParser   = require('cookie-parser');
 const logger         = require('morgan');
 const bodyParser     = require('body-parser');
-// const expressSession = require('express-session');
+const expressSession = require('express-session');
 // const https          = require('https');
 const passport       = require('passport');
 // const fs             = require('fs');
@@ -18,8 +18,8 @@ const token  = require('./token');
 const user   = require('./user');
 
 
-let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
+// let indexRouter = require('./routes/index');
+// let usersRouter = require('./routes/users');
 
 let app = express();
 
@@ -27,28 +27,28 @@ let app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(express.static('public'));
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+// app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// console.log('Using MemoryStore for the data store');
-// console.log('Using MemoryStore for the Session');
-// const MemoryStore = expressSession.MemoryStore;
-//
-// // Session Configuration
-// app.use(expressSession({
-//     saveUninitialized : true,
-//     resave            : true,
-//     secret            : config.session.secret,
-//     store             : new MemoryStore(),
-//     key               : 'authorization.sid',
-//     cookie            : { maxAge: config.session.maxAge },
-// }));
+console.log('Using MemoryStore for the data store');
+console.log('Using MemoryStore for the Session');
+const MemoryStore = expressSession.MemoryStore;
+
+// Session Configuration
+app.use(expressSession({
+    saveUninitialized : true,
+    resave            : true,
+    secret            : config.session.secret,
+    store             : new MemoryStore(),
+    key               : 'authorization.sid',
+    cookie            : { maxAge: config.session.maxAge, sameSite:'lax' },
+}));
 
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());

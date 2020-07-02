@@ -31,7 +31,7 @@ exports.loginForm = (req, res) => {
  * Authenticate normal login page using strategy of authenticate
  */
 exports.login = [
-    passport.authenticate('local', {successReturnToOrRedirect: '/', failureRedirect: '/login'}),
+    passport.authenticate('local', {successRedirect: '/', failureRedirect: '/login', session: 'false'}),
 ];
 
 /**
