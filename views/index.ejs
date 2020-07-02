@@ -22,8 +22,8 @@
 
       //replace the host name from the url and replace all the links we have with the host name as well.
       $(".hostname").text(host);
-      $("#authcode").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=code&client_id=abc123&scope=offline_access");
-      $("#implicit").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=token&client_id=abc123");
+      $("#authcode").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=code&client_id=euphoria-client&scope=offline_access");
+      $("#implicit").attr("href", "/dialog/authorize?redirect_uri=" + host + "&response_type=token&client_id=euphoria-client");
 
       if (!fragment) {
         //they did not come from the implicit work flow, so show the main work flow of the page.
@@ -32,10 +32,10 @@
         //if we have a fragment then they must have come from the url during an implicit call.  so show the
         //implicit work flow.
         $("#implicitdiv").show();
-        $("#accesstokenresult").text(fragment.substring(fragment.indexof("access_token="), fragment.indexof("&")));
-        $("#expirationresult").text(fragment.substring(fragment.indexof("expires_in="), fragment.indexof("&token_type=")));
-        $("#tokentyperesult").text(fragment.substring(fragment.indexof("token_type=")));
-        $(".access_token").text(fragment.substring((fragment.indexof("access_token=") + "access_token".length + 1), fragment.indexof("&")));
+        $("#accesstokenresult").text(fragment.substring(fragment.indexOf("access_token="), fragment.indexOf("&")));
+        $("#expirationresult").text(fragment.substring(fragment.indexOf("expires_in="), fragment.indexOf("&token_type=")));
+        $("#tokentyperesult").text(fragment.substring(fragment.indexOf("token_type=")));
+        $(".access_token").text(fragment.substring((fragment.indexOf("access_token=") + "access_token".length + 1), fragment.indexOf("&")));
       }
 
       $("#apiendpointbutton").click(function (event) {
@@ -46,12 +46,12 @@
           datatype: 'json',
           url: '/api/userinfo',
           headers: {
-            "authorization": "bearer " + fragment.substring(14, fragment.indexof("&"))
+            "authorization": "bearer " + fragment.substring(14, fragment.indexOf("&"))
           },
           success: function (result) {
             $("#implicitdiv").hide();
             $("#userinformation").show();
-            $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+            $("#userjsoninfo").text(JSON.stringify(result, undefined, 4));
           }
         });
       });
@@ -73,7 +73,7 @@
             $("#main").hide();
             $(".access_token").text(result.access_token);
             $("#accesstoken").show();
-            $("#fullresult").append(json.stringify(result, undefined, 4));
+            $("#fullresult").append(JSON.stringify(result, undefined, 4));
 
             $("#accesstokencallapibutton").click(function (event) {
               //they clicked on the resource owner token api call
@@ -87,7 +87,7 @@
                 success: function (result) {
                   $("#accesstoken").hide();
                   $("#userinformation").show();
-                  $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+                  $("#userjsoninfo").text(JSON.stringify(result, undefined, 4));
                 }
               });
             });
@@ -102,15 +102,15 @@
           datatype: 'json',
           url: "/oauth/token",
           headers: {
-            //this is abc123:ssh-secret base 64 encoded
-            "authorization": "basic ywjjmtizonnzac1zzwnyzxq="
+            //this is euphoria-client:ssh-secret base 64 encoded
+            "authorization": "basic ZXVwaG9yaWEtY2xpZW50OnNzaC1zZWNyZXQ="
           },
           data: 'grant_type=client_credentials',
           success: function (result) {
             $("#main").hide();
             $(".access_token").text(result.access_token);
             $("#accesstoken").show();
-            $("#fullresult").append(json.stringify(result, undefined, 4));
+            $("#fullresult").append(JSON.stringify(result, undefined, 4));
 
             $("#accesstokencallapibutton").click(function (event) {
               $.ajax({
@@ -123,7 +123,7 @@
                 success: function (result) {
                   $("#accesstoken").hide();
                   $("#userinformation").show();
-                  $("#userjsoninfo").text(json.stringify(result, undefined, 4));
+                  $("#userjsoninfo").text(JSON.stringify(result, undefined, 4));
                 }
               });
             });
@@ -155,7 +155,7 @@
   <span class="hostname">https://localhost:3000</span>/dialog/authorize?
   redirect_uri=<span class="hostname">https://localhost:3000</span>&
   response_type=code&
-  client_id=abc123&
+  client_id=euphoria-client&
   scope=offline_access
                 </pre>
   </a>
@@ -172,7 +172,7 @@
   <span class="hostname">https://localhost:3000/</span>/dialog/authorize?
   redirect_uri=<span class="hostname">https://localhost:3000</span>&
   response_type=token&
-  client_id=abc123
+  client_id=euphoria-client
             </pre>
   </a>
 
