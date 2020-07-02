@@ -6,12 +6,12 @@ const {v4:uuid} = require('uuid');
 const jwt  = require('jsonwebtoken');
 
 /** Private certificate used for signing JSON WebTokens */
-// const privateKey = fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem'));
-const privateKey = fs.readFileSync(path.join(__dirname, 'certs/euphoria-private.pfx'));
+const privateKey = fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem'));
+// const privateKey = fs.readFileSync(path.join(__dirname, 'certs/euphoria-private.pfx'));
 
 /** Public certificate used for verification.  Note: you could also use the private key */
-// const publicKey = fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'));
-const publicKey = fs.readFileSync(path.join(__dirname, 'certs/euphoria-public.cer'));
+const publicKey = fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'));
+// const publicKey = fs.readFileSync(path.join(__dirname, 'certs/euphoria-public.cer'));
 
 /**
  * Creates a signed JSON WebToken and returns it.  Utilizes the private certificate to create
